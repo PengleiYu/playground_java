@@ -10,15 +10,15 @@ public class AirConditionTest {
 
     private static final String[] sStates = {"STATE_OFF", "STATE_FAN_ONLY", "STATE_COOL"};
 
-    private static class AirCondition {
+    private static class AirCondition1 {
         private int mState;
 
-        AirCondition() {
+        AirCondition1() {
             mState = STATE_OFF;
-            printState();
         }
 
         void power() {
+            int pre = mState;
             switch (mState) {
                 case STATE_OFF:
                     mState = STATE_FAN_ONLY;
@@ -28,10 +28,11 @@ public class AirConditionTest {
                     mState = STATE_OFF;
                     break;
             }
-            printState();
+            printState(pre);
         }
 
         void cool() {
+            int pre = mState;
             switch (mState) {
                 case STATE_OFF:
                     break;
@@ -42,16 +43,16 @@ public class AirConditionTest {
                     mState = STATE_FAN_ONLY;
                     break;
             }
-            printState();
+            printState(pre);
         }
 
-        private void printState() {
-            System.out.println(sStates[mState]);
+        private void printState(int pre) {
+            System.out.println(String.format("%-15s -> %-15s", sStates[pre], sStates[mState]));
         }
     }
 
     public static void main(String[] args) {
-        AirCondition airCondition = new AirCondition();
+        AirCondition1 airCondition = new AirCondition1();
         airCondition.power();
         airCondition.cool();
         airCondition.power();
