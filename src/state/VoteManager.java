@@ -9,14 +9,13 @@ import java.util.Map;
 public class VoteManager {
     private Map<String, String> mVoteMap = new HashMap<>();
     private Map<String, Integer> mVoteCountMap = new HashMap<>();
-    private VoteState mVoteState = null;
 
 
     public interface VoteState {
         void vote(String user, String voteItem, VoteManager manager);
     }
 
-    public class NomalVoteState implements VoteState {
+    public class NormalVoteState implements VoteState {
         @Override
         public void vote(String user, String voteItem, VoteManager manager) {
             manager.mVoteMap.put(user, voteItem);
@@ -31,7 +30,7 @@ public class VoteManager {
         }
     }
 
-    public class SpliteVoteState implements VoteState {
+    public class SpiteVoteState implements VoteState {
         @Override
         public void vote(String user, String voteItem, VoteManager manager) {
             manager.mVoteMap.remove(user);
@@ -53,16 +52,17 @@ public class VoteManager {
         }
         mVoteCountMap.put(user, ++count);
 
+        VoteState voteState;
         if (count == 1) {
-            mVoteState = new NomalVoteState();
+            voteState = new NormalVoteState();
         } else if (count > 1 && count < 5) {
-            mVoteState = new RepeatVoteState();
+            voteState = new RepeatVoteState();
         } else if (count >= 5 && count < 8) {
-            mVoteState = new SpliteVoteState();
+            voteState = new SpiteVoteState();
         } else {
-            mVoteState = new BlackVoteState();
+            voteState = new BlackVoteState();
         }
-        mVoteState.vote(user, voteItem, this);
+        voteState.vote(user, voteItem, this);
     }
 
     public static void main(String[] args) {
