@@ -15,12 +15,12 @@ public class Constants {
     public static final String ACTION_CHAT_NEED_RESPOND = "action_chat_need_respond";
 
 
-    public static void write(String msg) {
-        threadPrint("write ==> " + msg);
+    public static void printWrite(String msg) {
+        threadPrint("printWrite ==> " + msg);
     }
 
-    public static void read(String msg) {
-        threadPrint("read <== " + msg);
+    public static void printRead(String msg) {
+        threadPrint("printRead <== " + msg);
     }
 
     private static void threadPrint(String msg) {

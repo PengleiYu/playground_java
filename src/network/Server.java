@@ -74,17 +74,17 @@ public class Server {
                 ByteBuffer byteBuffer = ByteBuffer.allocate(1024);
                 int read = socketChannel.read(byteBuffer);
                 if (read == -1) {
-                    System.out.println("read len =-1, closing...");
+                    System.out.println("printRead len =-1, closing...");
                     closeKey(key);
                     return;
                 }
                 byteBuffer.flip();
                 String msgRead = Charset.forName("utf8").decode(byteBuffer).toString();
-                Constants.read(msgRead);
+                Constants.printRead(msgRead);
                 if (Constants.ACTION_CHAT_NEED_RESPOND.equals(msgRead)) {
                     String msgWrite = "Hello, This is a response";
                     socketChannel.write(ByteBuffer.wrap(msgWrite.getBytes()));
-                    Constants.write(msgWrite);
+                    Constants.printWrite(msgWrite);
                 } else if (Constants.ACTION_DOWNLOAD_LARGE.equals(msgRead)) {
                     SelectionKey register = socketChannel.register(key.selector(), SelectionKey
                             .OP_WRITE);
@@ -115,15 +115,31 @@ public class Server {
 //            FileChannel.open(file.toPath(), StandardOpenOption.READ).transferTo
 //                    (0, file.length(), socketChannel);
             FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption.READ);
-            ByteBuffer byteBuffer = ByteBuffer.allocate(1024 * 1024);
+            ByteBuffer byteBuffer = ByteBuffer.allocate(1024 * 10);
             int len;
+            int gap = 0;
             while ((len = fileChannel.read(byteBuffer)) != -1) {
-                System.out.println("read len=" + len);
                 byteBuffer.flip();
-                socketChannel.write(byteBuffer);
+                int write;
+                while ((write = socketChannel.write(byteBuffer)) == 0) {
+                    System.out.println("write = 0, retry...");
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                System.out.println(String.format("read file %s, write %s", len, write));
+                if (len != write) {
+                    int i = len - write;
+                    gap += i;
+                    System.out.println(String.format("*********************read - write =  %s",
+                            i));
+                }
                 byteBuffer.clear();
             }
             System.out.println("file len=" + file.length());
+            System.out.println("gap = " + gap);
             System.out.println("after transfer");
             socketChannel.close();
         }

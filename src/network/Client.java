@@ -35,16 +35,16 @@ public class Client {
                 写字符串
                  */
                 socketChannel.write(ByteBuffer.wrap(mAction.getBytes()));
-                Constants.write(mAction);
+                Constants.printWrite(mAction);
 
                 switch (mAction) {
                     case Constants.ACTION_DOWNLOAD_LARGE:
                         File file = new File("client_a.mp4");
-                        recieveFile(socketChannel, file);
+                        receiveFile(socketChannel, file);
                         break;
                     case Constants.ACTION_DOWNLOAD_LITTLE:
                         File smallFile = new File("client_hah.gz");
-                        recieveFile(socketChannel, smallFile);
+                        receiveFile(socketChannel, smallFile);
                         break;
                     case Constants.ACTION_UPLOAD:
 
@@ -65,7 +65,7 @@ public class Client {
                             boolean readable = random.nextInt(100) % 2 == 0;
                             String strWrite = readable ? Constants.ACTION_CHAT_NEED_RESPOND :
                                     Constants.ACTION_CHAT_NO_RESPOND;
-                            Constants.write(strWrite);
+                            Constants.printWrite(strWrite);
                             socketChannel.write(ByteBuffer.wrap(strWrite.getBytes()));
 
                             if (readable) {
@@ -74,7 +74,7 @@ public class Client {
                                 byteBuffer.flip();
                                 String msgRead = Charset.forName("utf8").decode(byteBuffer)
                                         .toString();
-                                Constants.read(msgRead);
+                                Constants.printRead(msgRead);
                             }
 
 
@@ -88,7 +88,7 @@ public class Client {
             }
         }
 
-        private void recieveFile(SocketChannel socketChannel, File file) throws IOException {
+        private void receiveFile(SocketChannel socketChannel, File file) throws IOException {
             if (file.exists()) {
                 file.delete();
             }
@@ -98,11 +98,10 @@ public class Client {
 
             ByteBuffer byteBuffer = ByteBuffer.allocate(1024 * 1024);
             int len;
-            long size = 0;
             while ((len = socketChannel.read(byteBuffer)) != -1) {
-                System.out.println("receive " + (size += len));
                 byteBuffer.flip();
-                fileChannel.write(byteBuffer);
+                int write = fileChannel.write(byteBuffer);
+                System.out.println(String.format("receive %s, write file %s", len, write));
                 byteBuffer.clear();
             }
             System.out.println("final **** len=" + file.length());
