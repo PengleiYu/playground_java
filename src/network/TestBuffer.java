@@ -1,13 +1,6 @@
 package network;
 
-import lombok.AllArgsConstructor;
-
-import java.io.IOException;
-import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
-import java.nio.LongBuffer;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 
 /**
@@ -18,8 +11,9 @@ public class TestBuffer {
 //        test1();
         test2();
     }
-    private static void test2(){
-        String s="1234 56";
+
+    private static void test2() {
+        String s = "1234 56";
         System.out.println(s.split(" "));
     }
 
