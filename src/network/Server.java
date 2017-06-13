@@ -122,7 +122,7 @@ public class Server {
                 byteBuffer.flip();
                 int write = 0;
                 int i;
-                while (byteBuffer.position() != byteBuffer.limit()) {
+                while (byteBuffer.hasRemaining()) {
                     i = socketChannel.write(byteBuffer);
                     if (write != 0) {
                         System.out.println(String.format("have written %s, retry... ", write));
