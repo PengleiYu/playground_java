@@ -18,8 +18,14 @@ import java.util.Random;
 public class Client {
     public static void main(String[] args) {
 //        new Thread(new ClientRunnable(Constants.ACTION_CHAT, true)).start();
+//        new Thread(new ClientRunnable(Constants.ACTION_DOWNLOAD_LITTLE, false)).start();
+        new Thread(new ClientRunnable(Constants.ACTION_CHAT, true)).start();
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         new Thread(new ClientRunnable(Constants.ACTION_DOWNLOAD_LARGE, false)).start();
-        new Thread(new ClientRunnable(Constants.ACTION_DOWNLOAD_LITTLE, false)).start();
     }
 
     @AllArgsConstructor
@@ -51,8 +57,9 @@ public class Client {
                         break;
                     case Constants.ACTION_CHAT:
                         Random random = new Random();
+                        int num = 0;
                         while (mRunForever) {
-                            int sleep = random.nextInt(10000);
+                            int sleep = random.nextInt(1000);
                             System.out.println(String.format("start sleep %ss...", sleep / 1000f));
                             try {
                                 Thread.sleep(sleep);
@@ -63,9 +70,11 @@ public class Client {
                             }
 
                             boolean readable = random.nextInt(100) % 2 == 0;
-                            String strWrite = readable ? Constants.ACTION_CHAT_NEED_RESPOND :
-                                    Constants.ACTION_CHAT_NO_RESPOND;
+                            String strWrite = readable ? Constants.MSG_CHAT_NEED_RESPOND :
+                                    Constants.MSG_CHAT_NO_RESPOND;
+                            strWrite = strWrite + "*" + num++;
                             Constants.printWrite(strWrite);
+                            long timeWritten = System.currentTimeMillis();
                             socketChannel.write(ByteBuffer.wrap(strWrite.getBytes()));
 
                             if (readable) {
@@ -75,9 +84,9 @@ public class Client {
                                 String msgRead = Charset.forName("utf8").decode(byteBuffer)
                                         .toString();
                                 Constants.printRead(msgRead);
+                                System.out.println(String.format("write to read, time=%s",
+                                        System.currentTimeMillis() - timeWritten));
                             }
-
-
                         }
                         break;
                 }

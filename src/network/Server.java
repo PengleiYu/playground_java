@@ -22,6 +22,11 @@ public class Server {
         new Thread(new SelectorRunnable()).start();
     }
 
+    /**
+     * 异步IO，对每个socket注册selector，单一线程轮流处理
+     * 问题：若某个socket有大文件传输，可能会影响其他socket通信，待测
+     * 已测试，确实会阻塞其他线程,so必须单开一个线程用于传输大文件
+     */
     public static class SelectorRunnable implements Runnable {
         private final String ATTACH_READABLE = "ATTACH_READABLE";
         private final String ATTACH_WRITABLE = "ATTACH_WRITABLE";
@@ -81,7 +86,7 @@ public class Server {
                 byteBuffer.flip();
                 String msgRead = Charset.forName("utf8").decode(byteBuffer).toString();
                 Constants.printRead(msgRead);
-                if (Constants.ACTION_CHAT_NEED_RESPOND.equals(msgRead)) {
+                if (msgRead.contains(Constants.MSG_CHAT_NEED_RESPOND)) {
                     String msgWrite = "Hello, This is a response";
                     socketChannel.write(ByteBuffer.wrap(msgWrite.getBytes()));
                     Constants.printWrite(msgWrite);
@@ -103,7 +108,6 @@ public class Server {
                     key.cancel();
                     transferFile((SocketChannel) key.channel(), key.attachment().toString());
                 }
-
             }
         }
 
@@ -117,6 +121,11 @@ public class Server {
             int len;
             int gap = 0;
             while ((len = fileChannel.read(byteBuffer)) != -1) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
                 byteBuffer.flip();
                 int write = 0;
                 int i;
@@ -147,6 +156,9 @@ public class Server {
         }
     }
 
+    /**
+     * 同步IO，对接收到的每个socket开一个线程
+     */
     public static class ServerRunnable implements Runnable {
         @Override
         public void run() {
