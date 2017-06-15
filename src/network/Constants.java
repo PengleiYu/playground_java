@@ -23,7 +23,7 @@ public class Constants {
         threadPrint("printRead <== " + msg);
     }
 
-    private static void threadPrint(String msg) {
+    public static void threadPrint(String msg) {
         long id = Thread.currentThread().getId();
         System.out.println(String.format("Thread %s: %s", id, msg));
     }

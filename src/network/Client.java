@@ -26,6 +26,7 @@ public class Client {
             e.printStackTrace();
         }
         new Thread(new ClientRunnable(Constants.ACTION_DOWNLOAD_LARGE, false)).start();
+//        new Thread(new ClientRunnable(Constants.ACTION_CHAT, true)).start();
     }
 
     @AllArgsConstructor
@@ -99,7 +100,8 @@ public class Client {
 
         private void receiveFile(SocketChannel socketChannel, File file) throws IOException {
             if (file.exists()) {
-                file.delete();
+                boolean delete = file.delete();
+                Constants.threadPrint(String.format("delete file: %s, %s", file.getName(), delete));
             }
             FileChannel fileChannel = FileChannel.open(file.toPath(), StandardOpenOption
                     .CREATE, StandardOpenOption.WRITE);
@@ -111,7 +113,7 @@ public class Client {
                 byteBuffer.flip();
                 int write = fileChannel.write(byteBuffer);
                 System.out.println(String.format("receive %s, write file %s", len, write));
-                byteBuffer.clear();
+                byteBuffer.compact();
             }
             System.out.println("final **** len=" + file.length());
         }
