@@ -162,13 +162,14 @@ public class Server {
                         int write = socketChannel.write(mWriteBuffer);
                         Constants.threadPrint("write " + write);
                         try {
-                            Thread.sleep(100);
+                            Thread.sleep(500);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
                         mWriteBuffer.compact();
                     }
-                    Constants.threadPrint(String.format("transfer end, file len=%s",
+                    Constants.threadPrint(String.format(
+                            "==============transfer end, file len=%s==============",
                             file.length()));
                     socketChannel.close();
                 } else {

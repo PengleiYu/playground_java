@@ -25,6 +25,7 @@ public class Client {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        new Thread(new ClientRunnable(Constants.ACTION_DOWNLOAD_LITTLE, false)).start();
         new Thread(new ClientRunnable(Constants.ACTION_DOWNLOAD_LARGE, false)).start();
 //        new Thread(new ClientRunnable(Constants.ACTION_CHAT, true)).start();
     }
@@ -60,8 +61,9 @@ public class Client {
                         Random random = new Random();
                         int num = 0;
                         while (mRunForever) {
-                            int sleep = random.nextInt(1000);
-                            System.out.println(String.format("start sleep %ss...", sleep / 1000f));
+                            int sleep = random.nextInt(500);
+                            Constants.threadPrint(String.format("start sleep %ss...", sleep /
+                                    1000f));
                             try {
                                 Thread.sleep(sleep);
                             } catch (InterruptedException e) {
@@ -85,7 +87,7 @@ public class Client {
                                 String msgRead = Charset.forName("utf8").decode(byteBuffer)
                                         .toString();
                                 Constants.printRead(msgRead);
-                                System.out.println(String.format("write to read, time=%s",
+                                Constants.threadPrint(String.format("write to read, time=%s",
                                         System.currentTimeMillis() - timeWritten));
                             }
                         }
@@ -94,7 +96,7 @@ public class Client {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                System.out.println("Client end!");
+                Constants.threadPrint("Client end!");
             }
         }
 
@@ -112,10 +114,11 @@ public class Client {
             while ((len = socketChannel.read(byteBuffer)) != -1) {
                 byteBuffer.flip();
                 int write = fileChannel.write(byteBuffer);
-                System.out.println(String.format("receive %s, write file %s", len, write));
+                Constants.threadPrint(String.format("receive %s, write file %s", len, write));
                 byteBuffer.compact();
             }
-            System.out.println("final **** len=" + file.length());
+            Constants.threadPrint("==============final **** len=" + file.length() +
+                    "==============");
         }
     }
 
